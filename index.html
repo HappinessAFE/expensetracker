@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PennyWise | My Expense Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f5;
+            color: #24352d;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #176b45;
+            color: white;
+            padding: 28px;
+            border-radius: 18px;
+            margin-bottom: 24px;
+        }
+
+            header h1 {
+                margin-bottom: 8px;
+            }
+
+            header p {
+                color: #e1f3e8;
+            }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+        }
+
+            .card p {
+                color: #68766e;
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .card h2 {
+                font-size: 24px;
+                overflow-wrap: anywhere;
+            }
+
+        .green {
+            color: #176b45;
+        }
+
+        .red {
+            color: #c0392b;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+            .panel h2 {
+                margin-bottom: 18px;
+            }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+            .field label {
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d6dfd9;
+            border-radius: 9px;
+            font-size: 15px;
+            background: white;
+        }
+
+            input:focus, select:focus {
+                outline: 2px solid #8ac7a6;
+                border-color: #176b45;
+            }
+
+        button {
+            background: #176b45;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            padding: 13px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background: #105336;
+            }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 18px;
+        }
+
+        .expense-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .expense-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #edf0ed;
+        }
+
+        .expense-details {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+            .expense-details p {
+                font-weight: bold;
+            }
+
+            .expense-details small {
+                display: block;
+                color: #68766e;
+                margin-top: 5px;
+            }
+
+        .expense-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .expense-amount {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .delete-button {
+            background: #fcebea;
+            color: #b83227;
+            padding: 8px 10px;
+        }
+
+            .delete-button:hover {
+                background: #f7d7d5;
+            }
+
+        .empty-message {
+            color: #68766e;
+            padding: 10px 0;
+        }
+
+        .budget-note {
+            color: #68766e;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        footer {
+            text-align: center;
+            color: #68766e;
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            header, .panel {
+                padding: 20px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .expense-item {
+                align-items: flex-start;
+            }
+
+            .expense-right {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+
+        <header>
+            <h1>💸 PennyWise</h1>
+            <p>Your money, your plan, your future.</p>
+        </header>
+
+        <section class="dashboard">
+            <div class="card">
+                <p>Monthly Allowance</p>
+                <h2 class="green">R3,000.00</h2>
+            </div>
+
+            <div class="card">
+                <p>Total Spent</p>
+                <h2 id="totalSpent">R0.00</h2>
+            </div>
+
+            <div class="card">
+                <p>Allowance Remaining</p>
+                <h2 id="remaining">R3,000.00</h2>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>➕ Record an Expense</h2>
+
+            <form id="expenseForm">
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label for="description">
+                            What did you buy?
+                        </label>
+                        <input type="text"
+                               id="description"
+                               placeholder="e.g. Chips and a drink"
+                               required
+                               maxlength="100">
+                    </div>
+
+                    <div class="field">
+                        <label for="amount">Amount (R)</label>
+                        <input type="number"
+                               id="amount"
+                               placeholder="e.g. 35.00"
+                               min="0.01"
+                               max="3000"
+                               step="0.01"
+                               required>
+                    </div>
+
+                    <div class="field">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Toiletries">Toiletries</option>
+                            <option value="Subscriptions">Subscriptions</option>
+                            <option value="Transport">Uber / Transport</option>
+                            <option value="Junk food">Junk food / Takeaways</option>
+                            <option value="Clothing">Clothes / Personal treats</option>
+                            <option value="Unexpected">Unexpected expenses</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="submit-button">
+                    Add Expense
+                </button>
+            </form>
+
+            <p class="budget-note">
+                Tip: Record every purchase, even small ones.
+                They all count towards your monthly spending.
+            </p>
+        </section>
+
+        <section class="panel">
+            <h2>📋 My Expenses</h2>
+
+            <div id="expenseList" class="expense-list">
+                <p class="empty-message">
+                    No expenses yet. Add your first expense above!
+                </p>
+            </div>
+        </section>
+
+        <footer>
+            <p>Made with ❤️ for a better financial future.</p>
+        </footer>
+
+    </main>
+
+    <script>// 1. Set our monthly allowance.
+        const allowance = 3000;
+
+        // 2. Find the elements we need on the page.
+        const expenseForm = document.getElementById("expenseForm");
+        const descriptionInput = document.getElementById("description");
+        const amountInput = document.getElementById("amount");
+        const categoryInput = document.getElementById("category");
+        const dateInput = document.getElementById("date");
+
+        const totalSpentDisplay = document.getElementById("totalSpent");
+        const remainingDisplay = document.getElementById("remaining");
+        const expenseList = document.getElementById("expenseList");
+
+        // 3. Store expenses in the browser.
+        let expenses = [];
+
+        // Restore previously saved expenses.
+        try {
+            const savedExpenses = localStorage.getItem("pennyWiseExpenses");
+
+            if (savedExpenses) {
+                const parsedExpenses = JSON.parse(savedExpenses);
+
+                if (Array.isArray(parsedExpenses)) {
+                    expenses = parsedExpenses.filter(expense =>
+                        expense &&
+                        typeof expense.description === "string" &&
+                        typeof expense.amount === "number" &&
+                        Number.isFinite(expense.amount) &&
+                        expense.amount > 0 &&
+                        typeof expense.category === "string" &&
+                        typeof expense.date === "string"
+                    );
+                }
+            }
+        } catch (error) {
+            expenses = [];
+        }
+
+        // Set today's date in the date field.
+        const today = new Date();
+        const localDate = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, "0"),
+            String(today.getDate()).padStart(2, "0")
+        ].join("-");
+
+        dateInput.value = localDate;
+
+        // Display South African rand values.
+        function formatMoney(amount) {
+            return new Intl.NumberFormat("en-ZA", {
+                style: "currency",
+                currency: "ZAR"
+            }).format(amount);
+        }
+
+        // Save expenses in the browser.
+        function saveExpenses() {
+            try {
+                localStorage.setItem(
+                    "pennyWiseExpenses",
+                    JSON.stringify(expenses)
+                );
+            } catch (error) {
+                alert("Could not save expenses in this browser.");
+            }
+        }
+
+        // 4. Update the totals on the dashboard.
+        function updateDashboard() {
+            const totalSpent = expenses.reduce(
+                (total, expense) => total + expense.amount,
+                0
+            );
+
+            const remaining = allowance - totalSpent;
+
+            totalSpentDisplay.textContent = formatMoney(totalSpent);
+            remainingDisplay.textContent = formatMoney(remaining);
+
+            remainingDisplay.classList.toggle("red", remaining < 0);
+            remainingDisplay.classList.toggle("green", remaining >= 0);
+        }
+
+        // 5. Display all recorded expenses.
+        function displayExpenses() {
+            expenseList.replaceChildren();
+
+            if (expenses.length === 0) {
+                const message = document.createElement("p");
+                message.className = "empty-message";
+                message.textContent =
+                    "No expenses yet. Add your first expense above!";
+
+                expenseList.appendChild(message);
+                updateDashboard();
+                return;
+            }
+
+            expenses.forEach(function (expense) {
+                const item = document.createElement("div");
+                item.className = "expense-item";
+
+                const details = document.createElement("div");
+                details.className = "expense-details";
+
+                const description = document.createElement("p");
+                description.textContent = expense.description;
+
+                const info = document.createElement("small");
+                info.textContent =
+                    expense.category + " • " + expense.date;
+
+                details.append(description, info);
+
+                const right = document.createElement("div");
+                right.className = "expense-right";
+
+                const amount = document.createElement("span");
+                amount.className = "expense-amount";
+                amount.textContent = formatMoney(expense.amount);
+
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "delete-button";
+                deleteButton.textContent = "Delete";
+
+                deleteButton.addEventListener("click", function () {
+                    expenses = expenses.filter(
+                        entry => entry.id !== expense.id
+                    );
+
+                    saveExpenses();
+                    displayExpenses();
+                });
+
+                right.append(amount, deleteButton);
+                item.append(details, right);
+                expenseList.appendChild(item);
+            });
+
+            updateDashboard();
+        }
+
+        // 6. Handle the expense form.
+        expenseForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const description = descriptionInput.value.trim();
+            const amount = Number(amountInput.value);
+            const category = categoryInput.value;
+            const date = dateInput.value;
+
+            if (
+                !description ||
+                !Number.isFinite(amount) ||
+                amount <= 0 ||
+                amount > allowance ||
+                !date
+            ) {
+                alert("Please enter a valid description, amount and date.");
+                return;
+            }
+
+            const newExpense = {
+                id: Date.now() + Math.random(),
+                description: description,
+                amount: Math.round(amount * 100) / 100,
+                category: category,
+                date: date
+            };
+
+            expenses.push(newExpense);
+
+            saveExpenses();
+            displayExpenses();
+
+            expenseForm.reset();
+            dateInput.value = localDate;
+            descriptionInput.focus();
+        });
+
+        // 7. Load saved expenses when the page opens.
+        displayExpenses();</script>
+</body>
+</html>
